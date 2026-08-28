@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - JanSamadhan AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: #eef3f6; min-height: 100vh; }
+
+        .navbar {
+            background: #124e56;
+            padding: 14px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        }
+        .navbar .brand { color: white; font-size: 17px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .navbar .brand i { color: #4fd1c5; }
+        .admin-info { display: flex; align-items: center; gap: 15px; }
+        .admin-badge {
+            background: #0d3a40;
+            color: #dceef0;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .logout-btn {
+            background: #d93025;
+            color: white;
+            padding: 8px 18px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .logout-btn:hover { background: #b3261e; }
+
+        .page-wrap { max-width: 1300px; margin: 0 auto; padding: 25px 20px 60px; }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e1e8eb;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.03);
+        }
+        .stat-icon {
+            width: 42px; height: 42px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; margin-bottom: 12px;
+        }
+        .total .stat-icon { background: #e3edf0; color: #124e56; }
+        .pending .stat-icon { background: #ffe0e6; color: #e11d48; }
+        .progress .stat-icon { background: #e0f2fe; color: #0284c7; }
+        .resolved .stat-icon { background: #d1fae5; color: #059669; }
+        .critical .stat-icon { background: #fee2e2; color: #dc2626; }
+        .stat-number { font-size: 26px; font-weight: 700; color: #1a2b32; }
+        .stat-label { color: #6b7c85; font-size: 13px; margin-top: 3px; }
+
+        .table-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid #e1e8eb;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.03);
+        }
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .table-header h2 { color: #1a2b32; font-size: 18px; display: flex; align-items: center; gap: 10px; }
+        .table-header h2 i { color: #124e56; }
+        .ai-badge {
+            background: #124e56;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 600;
+        }
+
+        .complaints-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+        .complaints-table thead th {
+            background: #124e56;
+            color: white;
+            padding: 13px 10px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .complaints-table thead th:first-child { border-radius: 8px 0 0 0; }
+        .complaints-table thead th:last-child { border-radius: 0 8px 0 0; }
+        .complaints-table tbody tr:nth-child(even) { background: #f5f9fa; }
+        .complaints-table tbody tr:hover { background: #eaf3f4; }
+        .complaints-table tbody td { padding: 13px 10px; border-bottom: 1px solid #edf1f2; color: #1a2b32; vertical-align: middle; }
+
+        .duplicate-row { border-left: 4px solid #ff9800 !important; background: #fff8e1 !important; }
+        .duplicate-badge {
+            background: #ff9800; color: white; padding: 3px 10px; border-radius: 12px;
+            font-size: 10px; font-weight: 700; margin-left: 5px;
+            display: inline-flex; align-items: center; gap: 4px;
+        }
+
+        .badge {
+            padding: 5px 11px; border-radius: 20px; font-size: 10.5px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.4px; display: inline-block;
+        }
+        .badge-pending { background: #ffe0e6; color: #e11d48; }
+        .badge-progress { background: #e0f2fe; color: #0284c7; }
+        .badge-resolved { background: #d1fae5; color: #059669; }
+        .badge-critical { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
+
+        .sev-badge {
+            padding: 3px 9px; border-radius: 15px; font-size: 9.5px; font-weight: 700;
+            text-transform: uppercase; display: inline-block; margin-top: 5px;
+        }
+        .sev-critical { background: #dc2626; color: white; }
+        .sev-high { background: #ea580c; color: white; }
+        .sev-medium { background: #ca8a04; color: white; }
+        .sev-low { background: #16a34a; color: white; }
+
+        .img-thumb {
+            width: 64px; height: 64px; object-fit: cover; border-radius: 8px;
+            border: 2px solid #e1e8eb; cursor: pointer; display: block; transition: all 0.2s;
+        }
+        .img-thumb:hover { transform: scale(1.15); border-color: #124e56; z-index: 5; position: relative; }
+        .file-link {
+            display: inline-flex; align-items: center; gap: 6px; background: #f0f4f5;
+            padding: 7px 11px; border-radius: 8px; color: #124e56; text-decoration: none;
+            font-size: 11px; font-weight: 600;
+        }
+        .file-link:hover { background: #124e56; color: white; }
+
+        .status-form { display: flex; gap: 6px; align-items: center; }
+        .status-form select {
+            padding: 6px 8px; border: 1px solid #d7dfe3; border-radius: 8px;
+            font-size: 11px; font-family: 'Poppins', sans-serif; background: white; cursor: pointer;
+        }
+        .update-btn {
+            background: #124e56; color: white; border: none; padding: 6px 12px;
+            border-radius: 8px; font-size: 11px; font-weight: 600; cursor: pointer;
+        }
+        .update-btn:hover { background: #0d3a40; }
+
+        .delete-btn {
+            background: #d93025; color: white; border: none; padding: 6px 12px;
+            border-radius: 8px; font-size: 11px; font-weight: 600; cursor: pointer;
+            text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
+            margin-top: 5px;
+        }
+        .delete-btn:hover { background: #b3261e; }
+
+        .flash-container { margin-bottom: 18px; }
+        .flash-msg {
+            padding: 13px 18px; border-radius: 8px; margin-bottom: 10px; font-weight: 500;
+            display: flex; align-items: center; gap: 10px; font-size: 14px;
+        }
+        .flash-success { background: #dff5ec; color: #0f9d58; border-left: 4px solid #0f9d58; }
+        .flash-error { background: #fde8e8; color: #d93025; border-left: 4px solid #d93025; }
+
+        .empty-state { text-align: center; padding: 60px 20px; color: #6b7c85; }
+        .empty-state i { font-size: 55px; color: #d7dfe3; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="brand"><i class="fas fa-shield-alt"></i> JanSamadhan AI Admin</div>
+        <div class="admin-info">
+            <span class="admin-badge"><i class="fas fa-user-shield"></i> {{ session.get('admin_username', 'Admin') }}</span>
+            <a href="{{ url_for('admin_logout') }}" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </nav>
+
+    <div class="page-wrap">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flash-container">
+                {% for category, message in messages %}
+                    <div class="flash-msg flash-{{ category }}">
+                        <i class="fas {% if category == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"></i>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        {% endwith %}
+
+        {% set total = complaints|length %}
+        {% set pending = complaints|selectattr('status', 'equalto', 'Pending')|list|length %}
+        {% set progress = complaints|selectattr('status', 'equalto', 'In Progress')|list|length %}
+        {% set resolved = complaints|selectattr('status', 'equalto', 'Resolved')|list|length %}
+        {% set critical = complaints|selectattr('severity', 'equalto', 'Critical')|list|length %}
+
+        <div class="stats-container">
+            <div class="stat-card total">
+                <div class="stat-icon"><i class="fas fa-clipboard-list"></i></div>
+                <div class="stat-number">{{ total }}</div>
+                <div class="stat-label">Total Complaints</div>
+            </div>
+            <div class="stat-card pending">
+                <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                <div class="stat-number">{{ pending }}</div>
+                <div class="stat-label">Pending</div>
+            </div>
+            <div class="stat-card progress">
+                <div class="stat-icon"><i class="fas fa-spinner"></i></div>
+                <div class="stat-number">{{ progress }}</div>
+                <div class="stat-label">In Progress</div>
+            </div>
+            <div class="stat-card resolved">
+                <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-number">{{ resolved }}</div>
+                <div class="stat-label">Resolved</div>
+            </div>
+            <div class="stat-card critical">
+                <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="stat-number">{{ critical }}</div>
+                <div class="stat-label">AI Critical</div>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <div class="table-header">
+                <h2><i class="fas fa-list-alt"></i> All Complaints</h2>
+                <span class="ai-badge"><i class="fas fa-robot"></i> AI Severity Detection ON</span>
+            </div>
+
+            {% if complaints %}
+            <div style="overflow-x: auto;">
+                <table class="complaints-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Citizen</th>
+                            <th>Title / AI Severity</th>
+                            <th>Description</th>
+                            <th>Location</th>
+                            <th>📎 File</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in complaints %}
+                        <tr class="{% if c.id in duplicates %}duplicate-row{% endif %}">
+                            <td>
+                                <strong style="color: #124e56;">#{{ c.id }}</strong>
+                                {% if c.id in duplicates %}
+                                    <br>
+                                    <span class="duplicate-badge"><i class="fas fa-clone"></i> Duplicate</span>
+                                    {% for dup in duplicates[c.id][:1] %}
+                                        <small style="color:#ff9800; font-size:10px;"><br>Similar to #{{ dup.id }}</small>
+                                    {% endfor %}
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong>{{ c.name }}</strong><br>
+                                <small style="color: #6b7c85;"><i class="fas fa-phone"></i> {{ c.contact or 'N/A' }}</small>
+                            </td>
+                            <td>
+                                <strong>{{ c.title }}</strong>
+                                <br>
+                                <span class="sev-badge sev-{{ c.severity|lower }}"><i class="fas fa-brain"></i> AI: {{ c.severity }}</span>
+                            </td>
+                            <td style="max-width: 200px; font-size: 12px;">{{ c.description }}</td>
+                            <td><i class="fas fa-map-marker-alt" style="color: #e74c3c;"></i> {{ c.location }}</td>
+
+                            <td>
+                                {% if c.file_name %}
+                                    {% set ext = c.file_name.split('.')[-1].lower() %}
+                                    {% if ext in ['png', 'jpg', 'jpeg', 'gif', 'webp'] %}
+                                        <a href="{{ url_for('uploaded_file', filename=c.file_name) }}" target="_blank">
+                                            <img src="{{ url_for('uploaded_file', filename=c.file_name) }}"
+                                                 class="img-thumb"
+                                                 alt="Image"
+                                                 loading="lazy"
+                                                 onerror="this.onerror=null; this.closest('td').innerHTML='<span style=\'color:#d93025;font-size:11px;\'><i class=\'fas fa-exclamation-triangle\'></i> Load error</span>';">
+                                        </a>
+                                    {% else %}
+                                        <a href="{{ url_for('uploaded_file', filename=c.file_name) }}" target="_blank" class="file-link">
+                                            <i class="fas fa-file-{{ 'pdf' if ext == 'pdf' else 'word' if ext in ['doc','docx'] else 'alt' }}"></i>
+                                            {{ ext.upper() }}
+                                        </a>
+                                    {% endif %}
+                                {% else %}
+                                    <span style="color: #b2bec3; font-size: 12px;">—</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <span class="badge badge-{{ 'pending' if c.status == 'Pending' else 'progress' if c.status == 'In Progress' else 'resolved' if c.status == 'Resolved' else 'critical' }}">
+                                    {{ c.status }}
+                                </span>
+                            </td>
+                            <td><small>{{ c.created_at }}</small></td>
+                            <td>
+                                <form method="POST" action="{{ url_for('update_status', complaint_id=c.id) }}" class="status-form">
+                                    <select name="status">
+                                        <option value="Pending" {% if c.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                        <option value="In Progress" {% if c.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                                        <option value="Resolved" {% if c.status == 'Resolved' %}selected{% endif %}>Resolved</option>
+                                    </select>
+                                    <button type="submit" class="update-btn" title="Update"><i class="fas fa-sync-alt"></i></button>
+                                </form>
+
+                                {% if c.status == 'Resolved' %}
+                                    <a href="{{ url_for('delete_complaint', complaint_id=c.id) }}"
+                                       class="delete-btn"
+                                       onclick="return confirm('Delete complaint #{{ c.id }}?');">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h3>No Complaints Yet</h3>
+                <p>No complaints have been submitted so far.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}JanSamadhan AI{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">🏛️ JanSamadhan AI</div>
+        <div class="nav-links">
+            <a href="{{ url_for('home') }}">Complaint Karein</a>
+            <a href="{{ url_for('track_complaint') }}">Status Dekhein</a>
+            <a href="{{ url_for('admin') }}">Admin Panel</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer>
+        <p>JanSamadhan AI &mdash; Govt. of Jharkhand Grievance Redressal System (SIH26043)</p>
+    </footer>
+</body>
+</html>

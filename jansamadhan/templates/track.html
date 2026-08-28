@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Status - JanSamadhan AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: #eef3f6; min-height: 100vh; }
+
+        .navbar {
+            background: #124e56;
+            padding: 14px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        }
+        .navbar .brand { color: white; font-size: 17px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .navbar .brand i { color: #4fd1c5; }
+        .navbar .nav-links { display: flex; gap: 28px; }
+        .navbar .nav-links a { color: #dceef0; text-decoration: none; font-size: 14px; font-weight: 500; }
+        .navbar .nav-links a:hover, .navbar .nav-links a.active { color: #ffffff; text-decoration: underline; }
+
+        .page-wrap { max-width: 700px; margin: 0 auto; padding: 35px 20px 60px; }
+        .page-title h1 { color: #1a2b32; font-size: 26px; margin-bottom: 6px; }
+        .page-title p { color: #6b7c85; font-size: 14px; margin-bottom: 25px; }
+
+        .form-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid #e1e8eb;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+            margin-bottom: 25px;
+        }
+        .track-form { display: flex; gap: 12px; }
+        .form-control {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1px solid #d7dfe3;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            background: #f8fafb;
+        }
+        .form-control:focus { outline: none; border-color: #124e56; background: white; }
+        .track-btn {
+            padding: 11px 22px;
+            background: #124e56;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .track-btn:hover { background: #0d3a40; }
+
+        .result-card {
+            background: white;
+            border-radius: 12px;
+            padding: 28px;
+            border: 1px solid #e1e8eb;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+        }
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eef2f3;
+            font-size: 14px;
+        }
+        .result-row:last-child { border-bottom: none; }
+        .result-row .label { color: #6b7c85; font-weight: 500; }
+        .result-row .value { color: #1a2b32; font-weight: 600; text-align: right; max-width: 60%; }
+
+        .badge {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .badge-pending { background: #ffe0e6; color: #e11d48; }
+        .badge-progress { background: #e0f2fe; color: #0284c7; }
+        .badge-resolved { background: #d1fae5; color: #059669; }
+        .badge-critical { background: #fee2e2; color: #dc2626; }
+
+        .sev-critical { color: #dc2626; }
+        .sev-high { color: #ea580c; }
+        .sev-medium { color: #ca8a04; }
+        .sev-low { color: #16a34a; }
+
+        .flash-msg {
+            padding: 13px 18px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            font-weight: 500;
+            font-size: 14px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .flash-error { background: #fde8e8; color: #d93025; border-left: 4px solid #d93025; }
+
+        .file-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            color: #124e56;
+            font-weight: 600;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="brand"><i class="fas fa-landmark"></i> JanSamadhan AI</div>
+        <div class="nav-links">
+            <a href="{{ url_for('home') }}">File a Complaint</a>
+            <a href="{{ url_for('track_complaint') }}" class="active">Check Status</a>
+            <a href="{{ url_for('admin_login') }}">Admin Panel</a>
+        </div>
+    </nav>
+
+    <div class="page-wrap">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-msg flash-{{ category }}">
+                        <i class="fas fa-exclamation-circle"></i> {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="page-title">
+            <h1>Check Your Complaint Status</h1>
+            <p>Enter the complaint ID you received when you submitted your complaint.</p>
+        </div>
+
+        <div class="form-card">
+            <form method="POST" action="{{ url_for('track_complaint') }}" class="track-form">
+                <input type="text" name="complaint_id" class="form-control" placeholder="Enter complaint ID, e.g. 12" required>
+                <button type="submit" class="track-btn"><i class="fas fa-search"></i> Check</button>
+            </form>
+        </div>
+
+        {% if complaint %}
+        <div class="result-card">
+            <div class="result-row">
+                <span class="label">Complaint ID</span>
+                <span class="value">#{{ complaint.id }}</span>
+            </div>
+            <div class="result-row">
+                <span class="label">Name</span>
+                <span class="value">{{ complaint.name }}</span>
+            </div>
+            <div class="result-row">
+                <span class="label">Title</span>
+                <span class="value">{{ complaint.title }}</span>
+            </div>
+            <div class="result-row">
+                <span class="label">Description</span>
+                <span class="value">{{ complaint.description }}</span>
+            </div>
+            <div class="result-row">
+                <span class="label">Location</span>
+                <span class="value">{{ complaint.location }}</span>
+            </div>
+            <div class="result-row">
+                <span class="label">AI Severity</span>
+                <span class="value sev-{{ complaint.severity|lower }}">{{ complaint.severity }}</span>
+            </div>
+            <div class="result-row">
+                <span class="label">Status</span>
+                <span class="value">
+                    <span class="badge badge-{{ 'pending' if complaint.status == 'Pending' else 'progress' if complaint.status == 'In Progress' else 'resolved' if complaint.status == 'Resolved' else 'critical' }}">
+                        {{ complaint.status }}
+                    </span>
+                </span>
+            </div>
+            {% if complaint.file_name %}
+            <div class="result-row">
+                <span class="label">Attachment</span>
+                <span class="value">
+                    <a href="{{ url_for('uploaded_file', filename=complaint.file_name) }}" target="_blank" class="file-link">
+                        <i class="fas fa-paperclip"></i> View File
+                    </a>
+                </span>
+            </div>
+            {% endif %}
+            <div class="result-row">
+                <span class="label">Submitted On</span>
+                <span class="value">{{ complaint.created_at }}</span>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - JanSamadhan AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: #eef3f6; min-height: 100vh; }
+
+        .navbar {
+            background: #124e56;
+            padding: 14px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        }
+        .navbar .brand { color: white; font-size: 17px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .navbar .brand i { color: #4fd1c5; }
+        .navbar .nav-links { display: flex; gap: 28px; }
+        .navbar .nav-links a { color: #dceef0; text-decoration: none; font-size: 14px; font-weight: 500; }
+        .navbar .nav-links a:hover, .navbar .nav-links a.active { color: #ffffff; text-decoration: underline; }
+
+        .login-wrap {
+            max-width: 380px;
+            margin: 70px auto;
+            padding: 0 20px;
+        }
+        .login-icon {
+            width: 60px; height: 60px;
+            background: #124e56;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 18px;
+            color: white; font-size: 24px;
+        }
+        .login-title { text-align: center; margin-bottom: 25px; }
+        .login-title h1 { color: #1a2b32; font-size: 22px; margin-bottom: 5px; }
+        .login-title p { color: #6b7c85; font-size: 13px; }
+
+        .form-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid #e1e8eb;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+        }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; margin-bottom: 7px; color: #1a2b32; font-weight: 600; font-size: 13.5px; }
+        .form-control {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1px solid #d7dfe3;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            background: #f8fafb;
+        }
+        .form-control:focus { outline: none; border-color: #124e56; background: white; box-shadow: 0 0 0 3px rgba(18,78,86,0.1); }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: #124e56;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 5px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .login-btn:hover { background: #0d3a40; }
+
+        .flash-msg {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-weight: 500;
+            font-size: 13.5px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .flash-success { background: #dff5ec; color: #0f9d58; border-left: 4px solid #0f9d58; }
+        .flash-error { background: #fde8e8; color: #d93025; border-left: 4px solid #d93025; }
+
+        .back-link { text-align: center; margin-top: 16px; }
+        .back-link a { color: #6b7c85; font-size: 13px; text-decoration: none; }
+        .back-link a:hover { color: #124e56; text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="brand"><i class="fas fa-landmark"></i> JanSamadhan AI</div>
+        <div class="nav-links">
+            <a href="{{ url_for('home') }}">File a Complaint</a>
+            <a href="{{ url_for('track_complaint') }}">Check Status</a>
+            <a href="{{ url_for('admin_login') }}" class="active">Admin Panel</a>
+        </div>
+    </nav>
+
+    <div class="login-wrap">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-msg flash-{{ category }}">
+                        <i class="fas {% if category == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"></i>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="login-icon"><i class="fas fa-user-shield"></i></div>
+        <div class="login-title">
+            <h1>Admin Login</h1>
+            <p>For authorized admin use only</p>
+        </div>
+
+        <div class="form-card">
+            <form method="POST" action="{{ url_for('admin_login') }}">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" name="username" class="form-control" placeholder="Enter username" required autofocus>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" class="form-control" placeholder="Enter password" required>
+                </div>
+                <button type="submit" class="login-btn"><i class="fas fa-sign-in-alt"></i> Login</button>
+            </form>
+        </div>
+
+        <div class="back-link">
+            <a href="{{ url_for('home') }}"><i class="fas fa-arrow-left"></i> Back to Home</a>
+        </div>
+    </div>
+
+</body>
+</html>
