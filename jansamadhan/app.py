@@ -109,7 +109,7 @@ def init_db():
         )
     """)
     
-    cursor.execute("INSERT OR IGNORE INTO admin_users (id, username, password) VALUES (1, 'admin', 'admin123')")
+    cursor.execute("INSERT OR IGNORE INTO admin_users (id, username, password) VALUES (1, 'admin', 'patna123')")
     conn.commit()
     conn.close()
 
